@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Deadlock OS - CyberSec Lab</title>
+    <link rel="stylesheet" href="intelligent_os.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="canvas-bg"></div> <!-- Interactive BG -->
+    
+    <!-- Holographic Overlay -->
+    <div class="hologram-overlay"></div>
+
+    <div class="os-container">
+        <!-- Sidebar Navigation & AI Voice -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <i class="fa-solid fa-network-wired neon-icon"></i>
+                <div class="brand-text">
+                    <h1>A.I.D.E.S.</h1>
+                    <span>AI Deadlock Engine System</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="active nav-link" data-target="viewport-3d"><i class="fa-solid fa-cube"></i> Distributed 3D RAG</a>
+                <a href="#" class="nav-link" data-target="matrices-panel"><i class="fa-solid fa-microchip"></i> System Matrices</a>
+                <a href="#" class="nav-link" data-target="terminal-panel"><i class="fa-solid fa-shield-virus"></i> Threat Mitigation</a>
+                <a href="#" class="nav-link" data-target="hardware-panel"><i class="fa-solid fa-chart-pie"></i> Analytics Hub</a>
+            </nav>
+
+            <div class="voice-ai-panel">
+                <div class="ai-header">
+                    <span class="ai-name"><i class="fa-solid fa-robot"></i> K.A.R.A. System Voice</span>
+                    <span class="ai-status text-cyan">LISTENING</span>
+                </div>
+                <div class="waveform-container" id="ai-waveform">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+                <div class="ai-transcript" id="ai-chat">
+                    <span>> System initialized. Ready to simulate distributed deadlock scenarios.</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-workspace">
+            
+            <!-- Top Status Bar -->
+            <header class="top-bar glass-panel">
+                <div class="env-info">
+                    <span class="badge cyber-badge">ENV: LAB-ALPHA-7</span>
+                    <span class="badge protocol-badge" id="protocol-badge">PROTOCOL: NOMINAL</span>
+                </div>
+                <div class="system-stats-quick">
+                    <div class="stat"><i class="fa-solid fa-server"></i> Nodes: <span id="val-nodes">5</span></div>
+                    <div class="stat"><i class="fa-solid fa-database"></i> Resources: <span id="val-res">3</span></div>
+                    <div class="clock" id="os-clock">00:00:00.000</div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <!-- 3D RAG Viewport (Center Large) -->
+                <section class="panel viewport-3d glass-panel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-vr-cardboard"></i> Interactive 3D Resource Allocation Graph</h2>
+                        <div class="controls">
+                            <button id="btn-reset-cam" class="btn btn-outline btn-sm"><i class="fa-solid fa-camera"></i> Reset Cam</button>
+                            <button id="btn-run-sim" class="btn btn-primary"><i class="fa-solid fa-play"></i> Run AI Simulation</button>
+                        </div>
+                    </div>
+                    <div id="threejs-container" class="three-container"></div>
+                    <div class="viewport-overlay">
+                        <div class="legend-3d">
+                            <span><div class="sphere-icon process"></div> Process Node</span>
+                            <span><div class="cube-icon resource"></div> Resource Bank</span>
+                            <span><div class="line-icon alloc"></div> Allocation</span>
+                            <span><div class="line-icon req"></div> Request</span>
+                        </div>
+                        <div class="ai-prediction" id="ai-prediction-box">
+                            <span class="pred-label">AI Deadlock Probability</span>
+                            <span class="pred-value" id="pred-val">0%</span>
+                            <div class="pred-bar-bg"><div class="pred-bar-fill" id="pred-bar"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Hardware & Heatmap (Right Side Top) -->
+                <section class="panel hardware-panel glass-panel">
+                    <h2><i class="fa-solid fa-memory"></i> Live Telemetry & Heatmap</h2>
+                    <div class="charts-container">
+                        <div class="chart-wrapper"><canvas id="perfChart"></canvas></div>
+                    </div>
+                    <div class="heatmap-section">
+                        <h3>Resource Pressure Heatmap</h3>
+                        <div class="heatmap-grid" id="heatmap-container">
+                            <!-- Heatmap cells injected via JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Matrix Inputs (Bottom Left) -->
+                <section class="panel matrices-panel glass-panel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-table-cells"></i> Distributed Matrices</h2>
+                        <div class="controls">
+                            <div class="inline-inputs" style="margin-right: 15px;">
+                                <div title="Number of Processes">N: <input type="number" id="inp-nump" value="5" min="1" max="15" style="width: 45px;"></div>
+                                <div title="Number of Resources">M: <input type="number" id="inp-numr" value="3" min="1" max="10" style="width: 45px;"></div>
+                            </div>
+                            <button id="btn-randomize" class="btn btn-outline btn-sm"><i class="fa-solid fa-dice"></i> Generate Scenario</button>
+                        </div>
+                    </div>
+                    <div class="matrix-flex">
+                        <div class="matrix-group">
+                            <h3>Allocation</h3>
+                            <div id="alloc-table"></div>
+                        </div>
+                        <div class="matrix-group">
+                            <h3>Max Demand</h3>
+                            <div id="max-table"></div>
+                        </div>
+                        <div class="matrix-group">
+                            <h3>Need Demand</h3>
+                            <div id="need-table"></div>
+                        </div>
+                    </div>
+                    <div class="bottom-matrix-ctrls">
+                        <div class="avail-group">
+                            <h3>Global Available:</h3>
+                            <div id="avail-inputs" class="inline-inputs"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Threat & Terminal (Bottom Right) -->
+                <section class="panel terminal-panel glass-panel">
+                    <h2><i class="fa-solid fa-skull-crossbones"></i> Cyber Threat Terminal</h2>
+                    
+                    <div class="threat-alert hidden" id="threat-alert">
+                        <div class="glitch-text" data-text="CRITICAL DEADLOCK DETECTED">CRITICAL DEADLOCK DETECTED</div>
+                        <p class="threat-desc">Nodes <span id="deadlocked-nodes"></span> are caught in a circular dependency loop.</p>
+                        <button id="btn-ai-resolve" class="btn btn-danger btn-block mt-1"><i class="fa-solid fa-bolt"></i> Execute AI Recovery Protocol</button>
+                    </div>
+
+                    <div class="terminal-window" id="hacker-terminal">
+                        <!-- Logs -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    
+    <script src="intelligent_os.js"></script>
+</body>
+</html>
